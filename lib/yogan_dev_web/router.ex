@@ -17,11 +17,8 @@ defmodule YoganDevWeb.Router do
   scope "/", YoganDevWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
+    live "/", PageLive
+    live "/blog", ArticlesLive
+    live "/blog/:id/:slug", ShowArticleLive
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", YoganDevWeb do
-  #   pipe_through :api
-  # end
 end
