@@ -1,5 +1,5 @@
 defmodule YoganDev.Repo do
-  alias YoganDev.{Article, Content}
+  alias YoganDev.{Article, Content, Repo.Cache}
 
   @type entity_types :: Article.t() | Content.t()
 
@@ -8,12 +8,38 @@ defmodule YoganDev.Repo do
 
   @adapter Application.get_env(:yogan_dev, __MODULE__)[:adapter]
 
-  @spec articles :: {:ok, [Content.t()]} | {:error, term}
-  def articles, do: @adapter.all(Article)
+  @spec articles(boolean()) :: {:ok, [Content.t()]} | {:error, term}
+  def articles(skip_cache \\ false)
+  def articles(false), do: all(Article)
+  def articles(true), do: @adapter.all(Article)
 
-  @spec contents :: {:ok, [Content.t()]} | {:error, term}
-  def contents, do: @adapter.all(Content)
+  @spec contents(boolean()) :: {:ok, [Content.t()]} | {:error, term}
+  def contents(skip_cache \\ false)
+  def contents(false), do: all(Content)
+  def contents(true), do: @adapter.all(Content)
 
   @spec get_article(String.t()) :: {:ok, Article.t()} | {:error, term}
-  def get_article(id), do: @adapter.get(Article, id)
+  def get_article(id), do: get(Article, id)
+
+  defp all(entity) do
+    with cache <- cache_for(entity),
+         {:error, :not_found} <- Cache.all(cache),
+         {:ok, items} <- @adapter.all(entity) do
+      Cache.set_all(cache, items)
+      {:ok, items}
+    end
+  end
+
+  defp get(entity, id) do
+    with cache <- cache_for(entity),
+         {:error, :not_found} <- Cache.get(cache, id),
+         {:ok, item} <- @adapter.get(entity, id) do
+      Cache.set(cache, id, item)
+
+      {:ok, item}
+    end
+  end
+
+  defp cache_for(Article), do: YoganDev.Article.Cache
+  defp cache_for(Content), do: YoganDev.Content.Cache
 end
