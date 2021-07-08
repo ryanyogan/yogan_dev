@@ -17,4 +17,6 @@ config :tesla, adapter: Tesla.Adapter.Hackney
 
 config :yogan_dev, YoganDev.Repo, adapter: YoganDev.Repo.Http
 
+config :yogan_dev, YoganDev.Repo.Cache.Synchronizer, refresh_time: :timer.seconds(1)
+
 import_config "#{Mix.env()}.exs"

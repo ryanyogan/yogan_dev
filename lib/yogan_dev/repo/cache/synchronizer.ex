@@ -3,7 +3,7 @@ defmodule YoganDev.Repo.Cache.Synchronizer do
 
   use GenServer
 
-  @refresh_time :timer.seconds(10)
+  @refresh_time Application.get_env(:yogan_dev, __MODULE__)[:refresh_time]
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts)
