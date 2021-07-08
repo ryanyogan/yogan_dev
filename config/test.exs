@@ -6,5 +6,7 @@ config :yogan_dev, YoganDevWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+config :yogan_dev, YoganDev.Repo, adapter: YoganDev.Repo.Mock
+
 # Print only warnings and errors during test
 config :logger, level: :warn
