@@ -1,16 +1,24 @@
 defmodule YoganDev.Repo.Cache do
   use GenServer
 
+  alias __MODULE__.Synchronizer
+
   @callback table_name :: atom()
   @callback start_link(keyword()) :: GenServer.on_start()
+  @callback fetch_fn :: fun()
 
   @impl GenServer
   def init(name) do
+    Process.flag(:trap_exit, true)
+
     name
     |> table_for()
     |> :ets.new([:ordered_set, :protected, :named_table])
 
-    {:ok, %{name: name}}
+    {:ok, pid} = Synchronizer.start_link(cache: name)
+    ref = Process.monitor(pid)
+
+    {:ok, %{name: name, synchronizer_ref: ref}}
   end
 
   def all(cache) do
@@ -58,6 +66,21 @@ defmodule YoganDev.Repo.Cache do
     |> table_for()
     |> :ets.insert({id, item})
 
+    {:noreply, state}
+  end
+
+  @impl GenServer
+  def handle_info(
+        {:DOWN, ref, :process, _object, _reason},
+        %{synchronizer_ref: ref, name: name} = state
+      ) do
+    {:ok, pid} = Synchronizer.start_link(cache: name)
+    ref = Process.monitor(pid)
+
+    {:noreply, %{state | synchronizer_ref: ref}}
+  end
+
+  def handle_info({:EXIT, _, _}, state) do
     {:noreply, state}
   end
 

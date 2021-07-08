@@ -8,7 +8,7 @@ defmodule YoganDev.Repo do
 
   @adapter Application.get_env(:yogan_dev, __MODULE__)[:adapter]
 
-  @spec articles(boolean()) :: {:ok, [Content.t()]} | {:error, term}
+  @spec articles(boolean()) :: {:ok, [Article.t()]} | {:error, term}
   def articles(skip_cache \\ false)
   def articles(false), do: all(Article)
   def articles(true), do: @adapter.all(Article)

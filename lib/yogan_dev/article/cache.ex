@@ -1,5 +1,5 @@
 defmodule YoganDev.Article.Cache do
-  alias YoganDev.Repo.Cache
+  alias YoganDev.{Repo, Repo.Cache}
 
   @behaviour Cache
 
@@ -20,4 +20,7 @@ defmodule YoganDev.Article.Cache do
   def start_link(_args) do
     GenServer.start_link(Cache, __MODULE__, name: __MODULE__)
   end
+
+  @impl Cache
+  def fetch_fn, do: fn -> Repo.articles(true) end
 end
