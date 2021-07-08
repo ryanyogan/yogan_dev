@@ -15,11 +15,6 @@ config :phoenix, :json_library, Jason
 
 config :tesla, adapter: Tesla.Adapter.Hackney
 
-config :yogan_dev, Services.Airtable,
-  api_key: "keyzLBGQRZTZwSufJ",
-  base_id: "app6JnCMExhNnSdhR",
-  api_url: "https://api.airtable.com/v0/"
-
 config :yogan_dev, YoganDev.Repo, adapter: YoganDev.Repo.Http
 
 import_config "#{Mix.env()}.exs"
