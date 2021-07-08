@@ -3,8 +3,14 @@ defmodule YoganDevWeb.PageLive do
 
   alias YoganDevWeb.LiveEncoder
 
+  @topic "contents"
+
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      YoganDevWeb.Endpoint.subscribe(@topic)
+    end
+
     {:ok, assign_socket(socket)}
   end
 
@@ -18,6 +24,11 @@ defmodule YoganDevWeb.PageLive do
 
   def render_section(%{features: content}) do
     Phoenix.View.render(YoganDevWeb.PageView, "features.html", content: content)
+  end
+
+  @impl true
+  def handle_info(%{event: "update"}, socket) do
+    {:noreply, assign_socket(socket)}
   end
 
   defp assign_socket(socket) do

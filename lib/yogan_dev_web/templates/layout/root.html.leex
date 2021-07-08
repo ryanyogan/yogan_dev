@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <%= csrf_meta_tag() %>
-    <%= live_title_tag assigns[:page_title] || "YoganDev", suffix: " · Phoenix Framework" %>
+    <%= live_title_tag assigns[:page_title] || "YoganDev", suffix: " - Play with cool stuff" %>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <script defer phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </head>
-  <body>
+  <body class="has-navbar-fixed-top">
     <main class="main">
-      <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
+      <nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
         <div class="container">
           <div class="navbar-brand">
             <%= live_patch "Yogan Dev", to: Routes.live_path(@conn, YoganDevWeb.PageLive), class: "navbar-item has-text-weight-bold has-text-link" %>

@@ -3,13 +3,24 @@ defmodule YoganDevWeb.ArticlesLive do
 
   alias YoganDevWeb.LiveEncoder
 
+  @topic "articles"
+
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      YoganDevWeb.Endpoint.subscribe(@topic)
+    end
+
     {:ok, assign_socket(socket)}
   end
 
   def render_article(socket, %{id: _id, slug: _slug} = article) do
     Phoenix.View.render(YoganDevWeb.PageView, "article.html", socket: socket, article: article)
+  end
+
+  @impl true
+  def handle_info(%{event: "update"}, socket) do
+    {:noreply, assign_socket(socket)}
   end
 
   defp assign_socket(socket) do

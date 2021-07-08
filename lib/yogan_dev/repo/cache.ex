@@ -6,6 +6,9 @@ defmodule YoganDev.Repo.Cache do
   @callback table_name :: atom()
   @callback start_link(keyword()) :: GenServer.on_start()
   @callback fetch_fn :: fun()
+  @callback topic :: String.t()
+
+  @secret "cache secret"
 
   @impl GenServer
   def init(name) do
@@ -18,7 +21,7 @@ defmodule YoganDev.Repo.Cache do
     {:ok, pid} = Synchronizer.start_link(cache: name)
     ref = Process.monitor(pid)
 
-    {:ok, %{name: name, synchronizer_ref: ref}}
+    {:ok, %{name: name, synchronizer_ref: ref, hash: ""}}
   end
 
   def all(cache) do
@@ -52,11 +55,16 @@ defmodule YoganDev.Repo.Cache do
   def set(cache, id, item), do: GenServer.cast(cache, {:set, id, item})
 
   @impl GenServer
-  def handle_cast({:set_all, items}, %{name: name} = state)
+  def handle_cast({:set_all, items}, %{name: name, hash: hash} = state)
       when is_list(items) do
-    Enum.each(items, &:ets.insert(table_for(name), {&1.id, &1}))
+    new_hash = generate_hash(items)
 
-    {:noreply, state}
+    if hash != new_hash do
+      Enum.each(items, &:ets.insert(table_for(name), {&1.id, &1}))
+      broadcast(name, "update")
+    end
+
+    {:noreply, %{state | hash: new_hash}}
   end
 
   @impl GenServer
@@ -85,4 +93,14 @@ defmodule YoganDev.Repo.Cache do
   end
 
   defp table_for(name), do: apply(name, :table_name, [])
+
+  defp broadcast(name, action) when is_binary(action) do
+    YoganDevWeb.Endpoint.broadcast(apply(name, :topic, []), action, %{})
+  end
+
+  defp generate_hash(items) do
+    :hmac
+    |> :crypto.mac(:sha256, @secret, :erlang.term_to_binary(items))
+    |> Base.encode64()
+  end
 end

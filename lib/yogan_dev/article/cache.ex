@@ -2,6 +2,7 @@ defmodule YoganDev.Article.Cache do
   alias YoganDev.{Repo, Repo.Cache}
 
   @behaviour Cache
+  @topic "articles"
 
   def child_spec(opts) do
     %{
@@ -23,4 +24,7 @@ defmodule YoganDev.Article.Cache do
 
   @impl Cache
   def fetch_fn, do: fn -> Repo.articles(true) end
+
+  @impl Cache
+  def topic, do: @topic
 end
