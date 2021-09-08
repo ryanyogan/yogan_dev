@@ -1,4 +1,5 @@
 defmodule YoganDev.MixProject do
+  @moduledoc false
   use Mix.Project
 
   def project do
@@ -10,7 +11,8 @@ defmodule YoganDev.MixProject do
       compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -38,6 +40,15 @@ defmodule YoganDev.MixProject do
       {:tesla, "~> 1.3"},
       {:hackney, "~> 1.16.0"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
+    ]
+  end
+
+  defp releases do
+    [
+      yogan_dev: [
+        include_executable_for: [:unix],
+        cookie: "uLcbXGpeZfuJ0ziVZCnTuQ0sQtrI9mm42ghzvMbulY4B1QHBRVoouQ=="
+      ]
     ]
   end
 

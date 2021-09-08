@@ -1,4 +1,5 @@
 defmodule YoganDev.Repo.Cache do
+  @moduledoc false
   use GenServer
 
   alias __MODULE__.Synchronizer
